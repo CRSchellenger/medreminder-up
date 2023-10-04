@@ -249,3 +249,59 @@ wt()
 
 date = parser.parse(str1,fuzzy=True)
 print(f'Date found: {date}')"""
+
+
+
+settings = ['text','medfile','xanax','chris',5]
+
+
+def writetofile(settings): # for medschedule the name variable is not needed let name=0
+    filetype = settings[0]
+    dest = settings[1]
+    medname =  settings[2]
+    name = settings[3]
+    hoursapart = settings[4]
+
+    if filetype == 'text': 
+        if dest == 'medfile':
+            #add time and get date
+            ct = time.strftime('%m-%d-%Y %H:%M:%S') #date for log
+            tn = datetime.now() # get current date and time
+            tnn = tn + timedelta(hours=hoursapart) # adds the hours apart variable to the current time
+            xtt1 = tnn.strftime('%m-%d-%Y %H:%M:%S') # Rearranges the result of tnn 
+            r = '\n' + name +' has administered '+ medname +' at '+ ct  # combine the name variable with medname and the date for the activity log
+            #end of add time and get date
+
+            #Open and write to file
+            writetofile = open('medfile.txt', 'a') 
+            writetofile.writelines(r)
+            writetofile.close()
+            writetofile = open('medfile.txt','r+')
+            #End of open and write to file
+
+            #print success message and display the next dose time to user
+            print(Fore.WHITE+ Back.GREEN + '-' + medname + ' has been administered-'+Style.RESET_ALL + '\n' + Fore.BLACK + Back.YELLOW + '-next pill to be administered on- '+ xtt1 +Style.RESET_ALL)
+            print('Write to file success')
+
+        elif dest == 'medschedule':
+            ct = time.strftime('%m-%d-%Y %H:%M:%S') #date for log
+            tn = datetime.now() # get current date and time
+            tnn = tn + timedelta(hours=hoursapart) # adds the hours apart variable to the current time
+            xtt1 = tnn.strftime('%m-%d-%Y %H:%M:%S') # Rearranges the result of tnn 
+            r = '\n' + medname + ' at '+ xtt1
+            writetofile = open('medschedule.txt', 'a')
+
+            writetofile.writelines(r)
+            writetofile.close()
+            writetofile = open('medschedule.txt','r+')
+
+        
+writetofile(settings)
+
+settings = ['text','medschedule','xanax','chris',5]
+writetofile(settings)
+
+
+
+
+

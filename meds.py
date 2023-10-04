@@ -9,6 +9,10 @@ from playsound import playsound
 import os
 import string
 import random 
+from notifypy import Notify
+from dateutil import parser
+from dateutil import parser
+
 #def randfn(tk): #filename generation tts-mp3 and fn-t for text files. 
 #    if tk == 'tts':
 #        i = '_medreminder.mp3'
@@ -30,6 +34,146 @@ import random
 #        print(fn)
         
 #randfn(tk)
+def wt(): #notifacation engine
+    print(Fore.BLACK + Back.LIGHTGREEN_EX + '-Notification engine running-' + Style.BRIGHT +Style.RESET_ALL)
+    ld = [0]
+    c= 0
+    global l
+    
+    
+    ml = open('medschedule.txt', 'r')
+    content = ml.readlines()
+    lcd = len(content)
+    ld.append(lcd)
+    for l in ld:
+        l = l
+    if l == lcd:
+        td = datetime.now()
+        #print(content)
+        o = len(content)
+        if c == 0:
+            ml = open('medschedule.txt', 'r')
+            content = ml.readlines()
+            td = datetime.now()
+            for i in content:
+                if i == '\n':
+                    i.replace(i,'')
+                elif i != '\n':                        
+                    date = parser.parse(i,fuzzy=True)
+                    #print(f' this is the date from doc : {date}')
+                    t =datetime.now()
+                    ts = t.strftime('%Y-%m-%d %H:%M:%S')
+                    #print(f' this is the strftime output {ts}')
+                    tst = str(ts)
+                    dtt = str(date)
+                    if tst == dtt:
+                        notification = Notify( default_notification_application_name= 'Med reminder', default_notification_icon='icon.png')
+                        notification.title = "this is a test"
+                        notification.message = "test"
+                        notification.send()
+                        print(f'{i} is due')
+                        ml = open('medschedule.txt', 'r')
+                        c += 1
+                        print(c)
+                        pass
+        elif c ==1:
+            td = datetime.now()
+            for i in content:
+                if i == '\n':
+                    i.replace(i,'')
+                elif i != '\n':
+                    date = parser.parse(i,fuzzy=True)
+                    #print(f' this is the date from doc : {date}')
+                    t =datetime.now()
+                    ts = t.strftime('%Y-%m-%d %H:%M:%S')
+                    #print(f' this is the strftime output {ts}')
+                    tst = str(ts)
+                    dtt = str(date)
+                    if tst == dtt:
+                        notification = Notify( default_notification_application_name= 'Med reminder')
+                        notification.title = "this is a test"
+                        notification.message = "test"
+                        notification.send()
+                        ml = open('medschedule.txt', 'r')
+                        c += 1
+                        wt()
+    elif l < lcd:
+        print(Fore.BLACK + Back.YELLOW + 'switch program' + Style.RESET_ALL)
+        ml = open('medschedule.txt', 'r')
+        content = ml.readlines()
+        lcd = len(content)
+        ld.append(lcd)
+        if lcd == l:
+            td = datetime.now()
+            #print(content)
+            o = len(content)
+            if c == 0:
+                ml = open('medschedule.txt', 'r')
+                content = ml.readlines()
+                td = datetime.now()
+                for i in content:
+                    if i == '\n':
+                        i.replace(i,'')
+                    elif i != '\n':
+                        date = parser.parse(i,fuzzy=True)
+                        #print(f' this is the date from doc : {date}')
+                        t =datetime.now()
+                        ts = t.strftime('%Y-%m-%d %H:%M:%S')
+                        #print(f' this is the strftime output {ts}')
+                        tst = str(ts)
+                        dtt = str(date)
+                        if tst == dtt:
+                            notification = Notify( default_notification_application_name= 'Med reminder')
+                            notification.title = "this is a test"
+                            notification.message = "test"
+                            notification.send()
+                            ml = open('medschedule.txt', 'r')
+                            c += 1
+                            print(c)
+                            wt()
+
+                    
+        
+
+def writetofile(settings): # for medschedule the name variable is not needed let name=0
+    filetype = settings[0]
+    dest = settings[1]
+    medname =  settings[2]
+    name = settings[3]
+    hoursapart = settings[4]
+
+    if filetype == 'text': 
+        if dest == 'medfile':
+            #add time and get date
+            ct = time.strftime('%m-%d-%Y %H:%M:%S') #date for log
+            tn = datetime.now() # get current date and time
+            tnn = tn + timedelta(hours=hoursapart) # adds the hours apart variable to the current time
+            xtt1 = tnn.strftime('%m-%d-%Y %H:%M:%S') # Rearranges the result of tnn 
+            r = '\n' + name +' has administered '+ medname +' at '+ ct  # combine the name variable with medname and the date for the activity log
+            #end of add time and get date
+
+            #Open and write to file
+            writetofile = open('medfile.txt', 'a') 
+            writetofile.writelines(r)
+            writetofile.close()
+            writetofile = open('medfile.txt','r+')
+            #End of open and write to file
+
+            #print success message and display the next dose time to user
+            print(Fore.WHITE+ Back.GREEN + '-' + medname + ' has been administered-'+Style.RESET_ALL + '\n' + Fore.BLACK + Back.YELLOW + '-next pill to be administered on- '+ xtt1 +Style.RESET_ALL)
+            print('Write to file success')
+
+        elif dest == 'medschedule':
+            ct = time.strftime('%m-%d-%Y %H:%M:%S') #date for log
+            tn = datetime.now() # get current date and time
+            tnn = tn + timedelta(hours=hoursapart) # adds the hours apart variable to the current time
+            xtt1 = tnn.strftime('%m-%d-%Y %H:%M:%S') # Rearranges the result of tnn 
+            r = '\n' + medname + ' at '+ xtt1
+            writetofile = open('medschedule.txt', 'a')
+
+            writetofile.writelines(r)
+            writetofile.close()
+            writetofile = open('medschedule.txt','r+')
 
 
 def mrntta(i,tta,it,spd,stg): #tts system
@@ -135,13 +279,14 @@ def mrn(): #email service not working
                 timer.cancel()
     
 #Global dec. 
-global nm
-global tta
+global nm , i ,tta , it , spd, stg , settings
+
 
 def med_reminder(): # main program
-    tta =0 #tta service call- if 0 tts off and if 1 tts service will engage 
+    tta =0 #tts service call- if 0 tts off and if 1 tts service will engage 
     while True:
-        
+        from colorama import Fore,Back,Style
+
         if tta == 0: # first itiration w/o tts
             import os
             mrn()
@@ -157,163 +302,77 @@ def med_reminder(): # main program
                 
                 if i == 'xanax':
                     x = input('Please enter your name: ')
-                    ct = time.strftime('%Y-%m-%d %H:%M:%S')
-                    mt = time.strftime('%H:%m')
-                    xtt = datetime.now() + timedelta(hours=5)
-                    r = '-----------------' + '\n' + x +' has administered '+ i +' at '+ ct + '-----------------' 
+                    
+                    settings = ['text','medfile','xanax',x,5]
+                    writetofile(settings)
 
-                    medfile = open('medfile.txt', 'a')
-                    medfile.writelines(r)
-                    medfile.close()
-                    medfile = open('medfile.txt','r+')
+                    settings = ['text','medschedule','xanax',x,5]
+                    writetofile(settings)
 
-                    print(Fore.WHITE+ Back.GREEN+'Xanax has been administered'+Style.RESET_ALL)
-                    print(Fore.WHITE+ Back.YELLOW+'next pill to be administered at '+ str(xtt) + Style.RESET_ALL)
-
-                    xsr = '\n' + str(xtt) +' xanax'
-                    xs = open('medschedule.txt', 'a')
-                    xs.writelines(xsr)
-                    xs.close()
-                    xs = open('medschedule.txt', 'r+')
                     mrn()
                 elif i == 'oxycodone':
                     o = input('Please enter your name: ')
-                    rt = time.strftime('%Y-%m-%d %H:%M:%S')
-                    ot = time.strftime('%H:%m')
-                    ott = datetime.now() + timedelta(hours=4)
+                    
+                    settings = ['text','medfile','oxycodone',o,4]
+                    writetofile(settings)
 
-                    oi = '-----------------' + '\n' + o +' has administered '+ i +' at '+ rt + '-----------------' 
+                    settings = ['text','medschedule','oxycodone',o,4]
+                    writetofile(settings)
 
-                    medfile = open('medfile', 'a')
-                    medfile.writelines(oi)
-                    medfile.close()
-                    medfile = open('medfile.txt','r+')
-
-                    print(Fore.WHITE + Back.GREEN +'oxycodone has been administered'+Style.RESET_ALL)
-                    print(Fore.WHITE + Back.YELLOW +'next pill to be administered at '+ str(ott)+Style.RESET_ALL)
-
-                    osr = '\n' + str(ott) + ' oxycodone'
-                    os = open('medschedule.txt', 'a')
-                    os.writelines(str(osr))
-                    os.close()
-                    os = open('medschedule.txt', 'r+')
                     mrn()
                 elif i == 'loratadine':
                     ln = input('Please enter your name: ')
-                    lt = time.strftime('%Y-%m-%d %H:%M:%S')
-                    ltq = time.strftime('%H:%m')
-                    ltt = datetime.now() + timedelta(hours=24)
+                    
+                    settings = ['text','medfile','loratadine',ln,24]
+                    writetofile(settings)
 
-                    li = '-----------------' +  '\n' + ln +' has administered '+ i +' at '+ lt + '-----------------' 
-
-                    medfile = open('medfile.txt', 'a')
-                    medfile.writelines(li)
-                    medfile.close()
-                    medfile = open('medfile.txt','r+')
-
-                    print(Fore.WHITE + Back.GREEN + 'oxycodone has been administered'+Style.RESET_ALL)
-                    print(Fore.WHITE + Back.YELLOW +'next pill to be administered at '+ str(ltt)+Style.RESET_ALL)
-
-                    lsr = '\n' + str(ltt) + ' loratadine'
-                    ls = open('medschedule.txt', 'a')
-                    ls.writelines(str(lsr))
-                    ls.close()
-                    ls = open('medschedule.txt', 'r+')
+                    settings = ['text','medschedule','loratadine',ln,24]
+                    writetofile(settings)
+            
                     mrn()
                 elif i == 'tramadol':
                     tn = input('Please enter your name: ')
-                    tt = time.strftime('%Y-%m-%d %H:%M:%S')
-                    ttq = time.strftime('%H:%m')
-                    ttt = datetime.now() + timedelta(hours=6)
+                    
+                    settings = ['text','medfile','tramadol',tn,6]
+                    writetofile(settings)
 
-                    ti = '-----------------'  + '\n' + tn +' has administered '+ i +' at '+ tt + '-----------------' 
-
-                    medfile = open('medfile.txt', 'a')
-                    medfile.writelines(ti)
-                    medfile.close()
-                    medfile = open('medfile.txt','r+')
-
-                    print(Fore.WHITE + Back.GREEN+ 'Tramadol has been administered'+Style.RESET_ALL)
-                    print(Fore.WHITE + Back.YELLOW+ 'next pill to be administered at '+ str(ttt)+Style.RESET_ALL)
-
-                    tsr = '\n' + str(ttt) + ' tramadol'
-                    ts = open('medschedule.txt', 'a')
-                    ts.writelines(str(tsr))
-                    ts.close()
-                    ts = open('medschedule.txt', 'r+')
+                    settings = ['text','medschedule','tramadol',tn,6]
+                    writetofile(settings)
+                    
                     mrn()
 
                 elif i == 'temazepam':
-                        ten = input('Please enter your name: ')
-                        tet = time.strftime('%Y-%m-%d %H:%M:%S')
-                        tte = time.strftime('%H:%m')
-                        tte = datetime.now() + timedelta(hours=24)
+                    ten = input('Please enter your name: ')
+                    
+                    settings = ['text','medfile','temazepam',tn,24]
+                    writetofile(settings)
 
-                        te = '-----------------' +'\n' + ten +' has administered '+ i +' at '+ tet + '-----------------'
+                    settings = ['text','medschedule','temazepam',tn,24]
+                    writetofile(settings)
 
-                        medfile = open('medfile.txt', 'a')
-                        medfile.writelines(te)
-                        medfile.close()
-                        medfile = open('medfile.txt','r+')
-
-                        print(Fore.WHITE + Back.GREEN +'temazepam has been administered'+Style.RESET_ALL)
-                        print(Fore.WHITE + Back.YELLOW +'next pill to be administered at '+ str(tte)+Style.RESET_ALL)
-
-                        tse = '\n' + str(tte) + ' temazepam'
-                        te = open('medschedule.txt', 'a')
-                        te.writelines(str(tse))
-                        te.close()
-                        te = open('medschedule.txt', 'r+')
-
-                        mrn()
+                    mrn()
 
                 elif i == 'senokot':
-                        sen = input('Please enter your name: ')
-                        set = time.strftime('%Y-%m-%d %H:%M:%S')
-                        ste = time.strftime('%H:%m')
-                        ste = datetime.now() + timedelta(hours=12)
+                    sen = input('Please enter your name: ')
 
-                        se = '-----------------' +'\n' + sen +' has administered '+ i +' at '+ set + '-----------------'
+                    settings = ['text','medfile','senokot',sen,12]
+                    writetofile(settings)
 
-                        medfile = open('medfile.txt', 'a')
-                        medfile.writelines(se)
-                        medfile.close()
-                        medfile = open('medfile.txt','r+')
+                    settings = ['text','medschedule','senokot',sen,12]
+                    writetofile(settings)
 
-                        print(Fore.WHITE + Back.GREEN+'Senokot has been administered'+Style.RESET_ALL)
-                        print(Fore.WHITE + Back.YELLOW+'next pill to be administered at '+ str(ste)+Style.RESET_ALL)
-
-                        sse = '\n' + str(ste) + ' senokot'
-                        se = open('medschedule.txt', 'a')
-                        se.writelines(str(sse))
-                        se.close()
-                        se = open('medschedule.txt', 'r+')
-
-                        mrn()
+                    mrn()
 
                 elif i == 'fentanyl':
-                        fen = input('Please enter your name: ')
-                        fet = time.strftime('%Y-%m-%d %H:%M:%S')
-                        fte = time.strftime('%H:%m')
-                        fre = datetime.now() + timedelta(hours=24)
+                    fen = input('Please enter your name: ')
 
-                        fe = '-----------------' + '\n' + fen +' has administered '+ i +' at '+ fet + '-----------------' 
+                    settings = ['text','medfile','fentanyl',fen,24]
+                    writetofile(settings)
 
-                        medfile = open('medfile.txt', 'a')
-                        medfile.writelines(fe)
-                        medfile.close()
-                        medfile = open('medfile.txt','r+')
+                    settings = ['text','medschedule','fentanyl',fen,24]
+                    writetofile(settings)
 
-                        print(Fore.WHITE + Back.GREEN+'oxycodone has been administered'+Style.RESET_ALL)
-                        print(Fore.WHITE + Back.YELLOW+'next pill to be administered at '+ str(fre)+Style.RESET_ALL)
-
-                        fse = '\n' + str(fre) + ' fentanyl'
-                        fe = open('medschedule.txt', 'a')
-                        fe.writelines(str(fse))
-                        fe.close()
-                        fe = open('medschedule.txt', 'r+')
-
-                        mrn()
+                    mrn()
 
                 elif i == 'test':
                     fen = input('Please enter your name: ')
@@ -976,9 +1035,10 @@ def med_reminder(): # main program
 
 
 #texttospeech() https://towardsdatascience.com/easy-text-to-speech-with-python-bfb34250036e
+wt() #notifaction service call. automaticy looks for new dates and times    
+
 med_reminder()
-    
-mrntta(i,tta,it)
+#mrntta(i,tta,it,spd,stg)
 
 
             
